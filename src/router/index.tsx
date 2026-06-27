@@ -8,19 +8,23 @@ import Calendar from "../pages/Calendar";
 
 export const router = createBrowserRouter([
   {
-    element: <AuthLayout />,
+    path: "/",
     children: [
       { index: true, element: <Navigate to="/register" replace /> },
-      { path: "register", element: <Register /> },
-      { path: "login", element: <Login /> },
-    ],
-  },
-  {
-    element: <DashboardLayout />,
-    children: [
-      { index: true, element: <Navigate to="calendar" replace /> },
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "calendar", element: <Calendar /> },
+      {
+        element: <AuthLayout />,
+        children: [
+          { path: "register", element: <Register /> },
+          { path: "login", element: <Login /> },
+        ],
+      },
+      {
+        element: <DashboardLayout />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "calendar", element: <Calendar /> },
+        ],
+      },
     ],
   },
 ]);
