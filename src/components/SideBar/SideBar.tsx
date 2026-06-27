@@ -23,11 +23,11 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { icon: <CalendarDays size={20} />, label: "Calendario", to: "/calendar" },
-  { icon: <ClipboardList size={20} />, label: "Citas", to: "/dashboard" },
-  { icon: <UserPlus size={20} />, label: "Clientes", to: "/dashboard" },
-  { icon: <Tag size={20} />, label: "Servicios", to: "/dashboard" },
-  { icon: <UserCog size={20} />, label: "Empleados", to: "/dashboard" },
-  { icon: <BarChart3 size={20} />, label: "Reportes", to: "/dashboard" },
+  { icon: <ClipboardList size={20} />, label: "Citas", to: "/citas" },
+  { icon: <UserPlus size={20} />, label: "Clientes", to: "/clientes" },
+  { icon: <Tag size={20} />, label: "Servicios", to: "/servicios" },
+  { icon: <UserCog size={20} />, label: "Empleados", to: "/empleados" },
+  { icon: <BarChart3 size={20} />, label: "Reportes", to: "/reportes" },
 ];
 
 // Contenido interno del sidebar, compartido entre la versión desktop
@@ -44,8 +44,7 @@ const SidebarContent = ({
   const [indicatorTop, setIndicatorTop] = useState(0);
   const [indicatorHeight, setIndicatorHeight] = useState(0);
 
-  const isActivePath = (to: string) =>
-    to === "/" ? pathname === "/" : pathname.startsWith(to);
+  const isActivePath = (to: string) => pathname === to;
 
   useEffect(() => {
     if (collapsed || !listRef.current) {

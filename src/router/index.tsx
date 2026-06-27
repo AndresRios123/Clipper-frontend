@@ -5,6 +5,11 @@ import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Calendar from "../pages/Calendar";
+import Appointments from "../pages/Appointments";
+import Clients from "../pages/Clients";
+import Services from "../pages/Services";
+import Employees from "../pages/Employees";
+import Reports from "../pages/Reports";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +28,11 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <Dashboard /> },
           { path: "calendar", element: <Calendar /> },
+          { path: "citas", element: <Appointments /> },
+          { path: "clientes", element: <Clients /> },
+          { path: "servicios", element: <Services /> },
+          { path: "empleados", element: <Employees /> },
+          { path: "reportes", element: <Reports /> },
         ],
       },
     ],
