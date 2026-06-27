@@ -1,11 +1,15 @@
+import { useState } from "react";
+
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <nav className="w-full bg-[#939CFF] px-10 py-4 flex items-center justify-between relative">
+    <nav className="w-full bg-[#939CFF] px-6 md:px-10 py-6 flex items-center justify-between relative">
       {/* Logo */}
       <div className="flex-shrink-0 flex items-center gap-2">
         <svg
           width="30"
-          height= "30"
+          height="30"
           viewBox="0 0 123 127"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -17,8 +21,8 @@ const Navbar = () => {
         <span className="text-white text-xl font-bold">Clipper</span>
       </div>
 
-      {/* Links de navegación - centrados respecto al nav completo */}
-      <ul className="flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+      {/* Links de navegación - centrados respecto al nav completo (solo desktop) */}
+      <ul className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
         <li>
           <a
             href="#"
@@ -45,8 +49,8 @@ const Navbar = () => {
         </li>
       </ul>
 
-      {/* Acciones */}
-      <div className="flex items-center gap-6">
+      {/* Acciones (solo desktop) */}
+      <div className="hidden md:flex items-center gap-6">
         <a
           href="#"
           className="text-white text-sm font-normal hover:opacity-80 transition-opacity"
@@ -56,6 +60,111 @@ const Navbar = () => {
         <button
           type="button"
           className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors"
+        >
+          Registrate
+        </button>
+      </div>
+
+      {/* Botón hamburguesa (solo mobile) */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        aria-label="Abrir menú"
+        className="md:hidden flex items-center justify-center"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 6h16M4 12h16M4 18h16"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+
+      {/* Overlay oscuro de fondo (solo mobile, cuando el drawer está abierto) */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+        />
+      )}
+
+      {/* Drawer lateral (solo mobile) */}
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-[#939CFF] z-50 flex flex-col gap-6 p-6 transition-transform duration-300 ease-in-out md:hidden ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Botón cerrar */}
+        <button
+          type="button"
+          onClick={() => setIsOpen(false)}
+          aria-label="Cerrar menú"
+          className="self-end flex items-center justify-center"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+
+        {/* Links */}
+        <ul className="flex flex-col gap-5">
+          <li>
+            <a
+              href="#"
+              className="text-white text-base font-normal hover:opacity-80 transition-opacity"
+            >
+              Para quién?
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              className="text-white text-base font-normal hover:opacity-80 transition-opacity"
+            >
+              Servicios
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              className="text-white text-base font-normal hover:opacity-80 transition-opacity"
+            >
+              Precios
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              className="text-white text-base font-normal hover:opacity-80 transition-opacity"
+            >
+              Ir a mi cuenta
+            </a>
+          </li>
+        </ul>
+
+        {/* Botón Registrate */}
+        <button
+          type="button"
+          className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors w-full"
         >
           Registrate
         </button>
