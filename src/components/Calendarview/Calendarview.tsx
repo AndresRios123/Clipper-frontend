@@ -239,7 +239,7 @@ const CalendarView = () => {
         {days.map((day) => (
           <div
             key={day.date.toISOString()}
-            className="text-center pb-3 border-b border-gray-200"
+            className="text-center pb-3 border-b border-gray-300"
           >
             <p className="text-xs font-semibold text-gray-700">{day.label}</p>
             <p className="text-xs text-gray-500">{day.date.getDate()}</p>
@@ -263,7 +263,7 @@ const CalendarView = () => {
         {days.map((day) => (
           <div
             key={day.date.toISOString()}
-            className="relative border-l border-gray-100"
+            className="relative border-l border-gray-300"
             style={{ height: ROW_HEIGHT * hours.length }}
           >
             {/* Celdas de fondo: una por cada hora, con borde sutil y hover */}
@@ -272,7 +272,7 @@ const CalendarView = () => {
                 <div
                   key={hour}
                   style={{ height: ROW_HEIGHT }}
-                  className="border-b border-gray-100 hover:bg-gray-200/60 transition-colors"
+                  className="border-b border-gray-300 hover:bg-gray-200/90 transition-colors"
                   onMouseEnter={() =>
                     setHoveredCell({ dayLabel: day.label, hour, x: 0, y: 0 })
                   }
