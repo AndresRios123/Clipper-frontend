@@ -1,22 +1,18 @@
-import { useState } from "react";
 import RegisterInfo from "../../components/Register/RegisterInfo";
-import RegisterForm, { type AccountFormData } from "../../components/Register/RegisterForm";
+import RegisterForm, {
+  type RegisterFormData,
+} from "../../components/Register/RegisterForm";
 
 const Register = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [accountData, setAccountData] = useState<AccountFormData | null>(null);
-
-  const handleAccountSubmit = (data: AccountFormData) => {
-    setAccountData(data);
-    setCurrentStep(2);
-    // Por ahora solo guardamos los datos y avanzamos el paso.
-    // El step 2 (datos de la barbería) se conecta aquí cuando lo construyamos.
+  const handleComplete = (data: RegisterFormData) => {
+    console.log("Registro completo:", data);
+    // Aquí se conectará la llamada al backend (API) cuando esté lista.
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
       <RegisterInfo />
-      <RegisterForm onSubmitStep={handleAccountSubmit} />
+      <RegisterForm onComplete={handleComplete} />
     </div>
   );
 };
