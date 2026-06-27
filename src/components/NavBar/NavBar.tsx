@@ -4,7 +4,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-[#939CFF] px-6 md:px-10 py-6 flex items-center justify-between relative">
+    <nav className="w-full bg-[#939CFF] px-6 md:px-10 py-6 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Logo */}
       <div className="flex-shrink-0 flex items-center gap-2">
         <svg
