@@ -1,5 +1,5 @@
 import './App.css'
-import Register from './assets/pages/Register'
+import Register from './pages/Register'
 import Navbar from './components/NavBar/NavBar'
 import Footer from './components/Footer/Footer'
 

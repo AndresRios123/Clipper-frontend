@@ -1,7 +1,7 @@
-import RegisterInfo from "../../components/Register/RegisterInfo";
+import RegisterInfo from "../components/Register/RegisterInfo";
 import RegisterForm, {
   type RegisterFormData,
-} from "../../components/Register/RegisterForm";
+} from "../components/Register/RegisterForm";
 
 const Register = () => {
   const handleComplete = (data: RegisterFormData) => {
