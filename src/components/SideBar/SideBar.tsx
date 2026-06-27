@@ -17,7 +17,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { icon: <CalendarDays size={20} />, label: "Calendario", to: "/dashboard" },
+  { icon: <CalendarDays size={20} />, label: "Calendario", to: "/calendar" },
   { icon: <ClipboardList size={20} />, label: "Citas", to: "/dashboard" },
   { icon: <UserPlus size={20} />, label: "Clientes", to: "/dashboard" },
   { icon: <Tag size={20} />, label: "Servicios", to: "/dashboard" },

@@ -4,6 +4,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
+import Calendar from "../pages/Calendar";
 
 export const router = createBrowserRouter([
   {
@@ -17,7 +18,9 @@ export const router = createBrowserRouter([
   {
     element: <DashboardLayout />,
     children: [
+      { index: true, element: <Navigate to="calendar" replace /> },
       { path: "dashboard", element: <Dashboard /> },
+      { path: "calendar", element: <Calendar /> },
     ],
   },
 ]);
