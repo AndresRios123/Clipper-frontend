@@ -131,6 +131,7 @@ const Navbar = () => {
           <li>
             <Link
               to="/"
+              onClick={() => setIsOpen(false)}
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Para quién?
@@ -139,6 +140,7 @@ const Navbar = () => {
           <li>
             <Link
               to="/"
+              onClick={() => setIsOpen(false)}
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Servicios
@@ -147,6 +149,7 @@ const Navbar = () => {
           <li>
             <Link
               to="/"
+              onClick={() => setIsOpen(false)}
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Precios
@@ -155,6 +158,7 @@ const Navbar = () => {
           <li>
             <Link
               to="/login"
+              onClick={() => setIsOpen(false)}
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Ir a mi cuenta
@@ -165,6 +169,7 @@ const Navbar = () => {
         {/* Botón Registrate */}
         <Link
           to="/register"
+          onClick={() => setIsOpen(false)}
           className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors w-full text-center"
         >
           Registrate
