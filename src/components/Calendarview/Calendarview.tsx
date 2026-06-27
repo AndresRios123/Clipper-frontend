@@ -186,6 +186,15 @@ const CalendarView = () => {
     getMondayOfWeek(new Date(2026, 4, 20))
   );
   const [hoveredCell, setHoveredCell] = useState<HoveredCell | null>(null);
+  // Dirección del último cambio de semana, usada para animar el slide:
+  // "forward" = la semana nueva entra desde la derecha (avanzar)
+  // "backward" = la semana nueva entra desde la izquierda (retroceder)
+  const [direction, setDirection] = useState<"forward" | "backward">(
+    "forward"
+  );
+  // Cambia junto con currentMonday para forzar que React remonte el bloque
+  // de la semana y dispare la animación de entrada cada vez
+  const [animationKey, setAnimationKey] = useState(0);
 
   const days = useMemo(() => buildWeek(currentMonday), [currentMonday]);
   const headerLabel = useMemo(() => getHeaderLabel(days), [days]);
@@ -193,13 +202,17 @@ const CalendarView = () => {
   const goToPreviousWeek = () => {
     const prev = new Date(currentMonday);
     prev.setDate(prev.getDate() - 7);
+    setDirection("backward");
     setCurrentMonday(prev);
+    setAnimationKey((k) => k + 1);
   };
 
   const goToNextWeek = () => {
     const next = new Date(currentMonday);
     next.setDate(next.getDate() + 7);
+    setDirection("forward");
     setCurrentMonday(next);
+    setAnimationKey((k) => k + 1);
   };
 
   return (
@@ -230,98 +243,115 @@ const CalendarView = () => {
         </div>
       </div>
 
-      {/* Grid del calendario */}
-      <div className="grid grid-cols-[60px_repeat(7,1fr)]">
-        {/* Esquina vacía sobre la columna de horas */}
-        <div />
+      {/* Contenedor con scroll horizontal: el grid nunca se comprime,
+          si no cabe aparece scroll en vez de encoger las columnas */}
+      <div className="overflow-x-auto">
+        <div
+          key={animationKey}
+          className="min-w-[700px]"
+          style={{
+            animation: `${
+              direction === "forward" ? "slide-in-right" : "slide-in-left"
+            } 0.3s ease-out`,
+          }}
+        >
+          {/* Grid del calendario */}
+          <div className="grid grid-cols-[60px_repeat(7,1fr)]">
+            {/* Esquina vacía sobre la columna de horas */}
+            <div />
 
-        {/* Encabezados de días */}
-        {days.map((day) => (
-          <div
-            key={day.date.toISOString()}
-            className="text-center pb-3 border-b border-gray-300"
-          >
-            <p className="text-xs font-semibold text-gray-700">{day.label}</p>
-            <p className="text-xs text-gray-500">{day.date.getDate()}</p>
-          </div>
-        ))}
+            {/* Encabezados de días */}
+            {days.map((day) => (
+              <div
+                key={day.date.toISOString()}
+                className="text-center pb-3 border-b border-gray-200"
+              >
+                <p className="text-xs font-semibold text-gray-700">
+                  {day.label}
+                </p>
+                <p className="text-xs text-gray-500">{day.date.getDate()}</p>
+              </div>
+            ))}
 
-        {/* Columna de horas */}
-        <div className="flex flex-col">
-          {hours.map((hour) => (
-            <div
-              key={hour}
-              style={{ height: ROW_HEIGHT }}
-              className="text-xs text-gray-500 border-b border-gray-100 -translate-y-2"
-            >
-              {formatHourLabel(hour)}
-            </div>
-          ))}
-        </div>
-
-        {/* Columnas de días con sus citas */}
-        {days.map((day) => (
-          <div
-            key={day.date.toISOString()}
-            className="relative border-l border-gray-300"
-            style={{ height: ROW_HEIGHT * hours.length }}
-          >
-            {/* Celdas de fondo: una por cada hora, con borde sutil y hover */}
-            <div className="absolute inset-0 flex flex-col">
+            {/* Columna de horas */}
+            <div className="flex flex-col">
               {hours.map((hour) => (
                 <div
                   key={hour}
                   style={{ height: ROW_HEIGHT }}
-                  className="border-b border-gray-300 hover:bg-gray-200/90 transition-colors"
-                  onMouseEnter={() =>
-                    setHoveredCell({ dayLabel: day.label, hour, x: 0, y: 0 })
-                  }
-                  onMouseMove={(e) =>
-                    setHoveredCell({
-                      dayLabel: day.label,
-                      hour,
-                      x: e.clientX,
-                      y: e.clientY,
-                    })
-                  }
-                  onMouseLeave={() => setHoveredCell(null)}
-                />
+                  className="text-xs text-gray-500 border-b border-gray-100 -translate-y-2"
+                >
+                  {formatHourLabel(hour)}
+                </div>
               ))}
             </div>
 
-            {/* Citas, posicionadas encima de las celdas */}
-            {day.appointments.map((appt) => {
-              const top = (appt.startHour - START_HOUR) * ROW_HEIGHT;
-              const height = (appt.endHour - appt.startHour) * ROW_HEIGHT;
-              const styles = colorStyles[appt.color];
-
-              return (
-                <div
-                  key={appt.id}
-                  className="absolute left-1 right-1 rounded-lg px-2 py-1.5 overflow-hidden pointer-events-none"
-                  style={{
-                    top,
-                    height,
-                    backgroundColor: styles.bg,
-                  }}
-                >
-                  <p
-                    className="text-xs font-semibold leading-tight"
-                    style={{ color: styles.text }}
-                  >
-                    {appt.clientName}
-                  </p>
-                  <p
-                    className="text-xs leading-tight"
-                    style={{ color: styles.text }}
-                  >
-                    {formatHourLabel(appt.startHour)} - {formatHourLabel(appt.endHour)}
-                  </p>
+            {/* Columnas de días con sus citas */}
+            {days.map((day) => (
+              <div
+                key={day.date.toISOString()}
+                className="relative border-l border-gray-100"
+                style={{ height: ROW_HEIGHT * hours.length }}
+              >
+                {/* Celdas de fondo: una por cada hora, con borde sutil y hover */}
+                <div className="absolute inset-0 flex flex-col">
+                  {hours.map((hour) => (
+                    <div
+                      key={hour}
+                      style={{ height: ROW_HEIGHT }}
+                      className="border-b border-gray-100 hover:bg-gray-200/60 transition-colors"
+                      onMouseEnter={() =>
+                        setHoveredCell({ dayLabel: day.label, hour, x: 0, y: 0 })
+                      }
+                      onMouseMove={(e) =>
+                        setHoveredCell({
+                          dayLabel: day.label,
+                          hour,
+                          x: e.clientX,
+                          y: e.clientY,
+                        })
+                      }
+                      onMouseLeave={() => setHoveredCell(null)}
+                    />
+                  ))}
                 </div>
-              );
-            })}
+
+                {/* Citas, posicionadas encima de las celdas */}
+                {day.appointments.map((appt) => {
+                  const top = (appt.startHour - START_HOUR) * ROW_HEIGHT;
+                  const height = (appt.endHour - appt.startHour) * ROW_HEIGHT;
+                  const styles = colorStyles[appt.color];
+
+                  return (
+                    <div
+                      key={appt.id}
+                      className="absolute left-1 right-1 rounded-lg px-2 py-1.5 overflow-hidden pointer-events-none"
+                      style={{
+                        top,
+                        height,
+                        backgroundColor: styles.bg,
+                      }}
+                    >
+                      <p
+                        className="text-xs font-semibold leading-tight"
+                        style={{ color: styles.text }}
+                      >
+                        {appt.clientName}
+                      </p>
+                      <p
+                        className="text-xs leading-tight"
+                        style={{ color: styles.text }}
+                      >
+                        {formatHourLabel(appt.startHour)} -{" "}
+                        {formatHourLabel(appt.endHour)}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
 
       {/* Tooltip flotante que sigue al cursor */}
@@ -336,6 +366,30 @@ const CalendarView = () => {
           {hoveredCell.dayLabel} · {formatHourRangeLabel(hoveredCell.hour)}
         </div>
       )}
+
+      {/* Keyframes de la animación de slide al cambiar de semana */}
+      <style>{`
+        @keyframes slide-in-right {
+          from {
+            transform: translateX(24px);
+            opacity: 0.4;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes slide-in-left {
+          from {
+            transform: translateX(-24px);
+            opacity: 0.4;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };
