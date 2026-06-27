@@ -4,7 +4,7 @@ import Navbar from './components/NavBar/NavBar'
 
 function App() {
   return (
-    <div>
+    <div className="pt-[78px]">
       <Navbar/>
       <Register/>
     </div>
