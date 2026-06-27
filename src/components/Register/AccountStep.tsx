@@ -38,7 +38,7 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
   };
 
   return (
-    <div className="w-full h-full bg-[#A2AAFF] flex flex-col justify-center px-10 lg:px-20 py-12">
+    <div className="w-full h-full bg-[#A2AAFF] flex flex-col justify-center px-6 lg:px-20 py-20 md:py-12">
       {/* Título */}
       <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-8">
         Registrate, es 100%
