@@ -10,7 +10,8 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { useRef, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useSidebar } from "./Sidebarcontext";
 
@@ -37,45 +38,89 @@ const SidebarContent = ({
 }: {
   collapsed: boolean;
   onLinkClick?: () => void;
-}) => (
-  <>
-    {/* Navegación principal */}
-    <nav className="flex-1 px-4 mt-4">
-      <ul className="flex flex-col gap-2">
-        {navItems.map((item) => (
-          <li key={item.label}>
-            <Link
-              to={item.to}
-              onClick={onLinkClick}
-              title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-white text-sm font-medium hover:bg-white/10 transition-colors ${
-                collapsed ? "justify-center" : ""
-              }`}
-            >
-              {item.icon}
-              {!collapsed && item.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+}) => {
+  const { pathname } = useLocation();
+  const listRef = useRef<HTMLUListElement>(null);
+  const [indicatorTop, setIndicatorTop] = useState(0);
+  const [indicatorHeight, setIndicatorHeight] = useState(0);
 
-    {/* Ajustes (anclado al fondo) */}
-    <div className="px-4 pb-6">
-      <Link
-        to="/dashboard"
-        onClick={onLinkClick}
-        title={collapsed ? "Ajustes" : undefined}
-        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-white text-sm font-medium hover:bg-white/10 transition-colors ${
-          collapsed ? "justify-center" : ""
-        }`}
-      >
-        <Settings size={20} />
-        {!collapsed && "Ajustes"}
-      </Link>
-    </div>
-  </>
-);
+  const isActivePath = (to: string) =>
+    to === "/" ? pathname === "/" : pathname.startsWith(to);
+
+  useEffect(() => {
+    if (collapsed || !listRef.current) {
+      return;
+    }
+    const activeItem = listRef.current.querySelector('[data-active="true"]');
+    if (activeItem instanceof HTMLElement) {
+      setIndicatorTop(activeItem.offsetTop);
+      setIndicatorHeight(activeItem.offsetHeight);
+    }
+  }, [collapsed, pathname]);
+
+  return (
+    <>
+      {/* Navegación principal */}
+      <nav className="flex-1 px-4 mt-4 relative">
+        {/* Indicador deslizante (pill) */}
+        {!collapsed && indicatorHeight > 0 && (
+          <div
+            className="absolute left-4 right-4 bg-white/15 rounded-lg transition-all duration-300 ease-in-out pointer-events-none"
+            style={{ top: indicatorTop, height: indicatorHeight }}
+          />
+        )}
+
+        <ul className="flex flex-col gap-2 relative" ref={listRef}>
+          {navItems.map((item) => {
+            const active = isActivePath(item.to);
+            return (
+              <li key={item.label} data-active={active}>
+                <NavLink
+                  to={item.to}
+                  onClick={onLinkClick}
+                  end
+                  title={collapsed ? item.label : undefined}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    active
+                      ? "bg-white/15 text-white"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                  } ${collapsed ? "justify-center" : ""}`}
+                >
+                  {active && !collapsed && (
+                    <span className="w-2 h-2 rounded-full bg-white flex-shrink-0" />
+                  )}
+                  {item.icon}
+                  {!collapsed && item.label}
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* Ajustes (anclado al fondo) */}
+      <div className="px-4 pb-6">
+        <NavLink
+          to="/dashboard"
+          onClick={onLinkClick}
+          end
+          title={collapsed ? "Ajustes" : undefined}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+            isActivePath("/dashboard")
+              ? "bg-white/15 text-white"
+              : "text-white/70 hover:bg-white/10 hover:text-white"
+          } ${collapsed ? "justify-center" : ""}`}
+        >
+          {isActivePath("/dashboard") && !collapsed && (
+            <span className="w-2 h-2 rounded-full bg-white flex-shrink-0" />
+          )}
+          <Settings size={20} />
+          {!collapsed && "Ajustes"}
+        </NavLink>
+      </div>
+    </>
+  );
+};
 
 const Logo = () => (
   <svg width="24" height="24" viewBox="0 0 123 127" xmlns="http://www.w3.org/2000/svg">
