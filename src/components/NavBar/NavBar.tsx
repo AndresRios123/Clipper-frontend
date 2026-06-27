@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,45 +25,45 @@ const Navbar = () => {
       {/* Links de navegación - centrados respecto al nav completo (solo desktop) */}
       <ul className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
         <li>
-          <a
-            href="#"
+          <Link
+            to="/"
             className="text-white text-sm font-normal hover:opacity-80 transition-opacity"
           >
             Para quién?
-          </a>
+          </Link>
         </li>
         <li>
-          <a
-            href="#"
+          <Link
+            to="/"
             className="text-white text-sm font-normal hover:opacity-80 transition-opacity"
           >
             Servicios
-          </a>
+          </Link>
         </li>
         <li>
-          <a
-            href="#"
+          <Link
+            to="/"
             className="text-white text-sm font-normal hover:opacity-80 transition-opacity"
           >
             Precios
-          </a>
+          </Link>
         </li>
       </ul>
 
       {/* Acciones (solo desktop) */}
       <div className="hidden md:flex items-center gap-6">
-        <a
-          href="#"
+        <Link
+          to="/login"
           className="text-white text-sm font-normal hover:opacity-80 transition-opacity"
         >
           Ir a mi cuenta
-        </a>
-        <button
-          type="button"
-          className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors"
+        </Link>
+        <Link
+          to="/register"
+          className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors inline-block"
         >
           Registrate
-        </button>
+        </Link>
       </div>
 
       {/* Botón hamburguesa (solo mobile) */}
@@ -128,46 +129,46 @@ const Navbar = () => {
         {/* Links */}
         <ul className="flex flex-col gap-5">
           <li>
-            <a
-              href="#"
+            <Link
+              to="/"
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Para quién?
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
+            <Link
+              to="/"
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Servicios
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
+            <Link
+              to="/"
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Precios
-            </a>
+            </Link>
           </li>
           <li>
-            <a
-              href="#"
+            <Link
+              to="/login"
               className="text-white text-base font-normal hover:opacity-80 transition-opacity"
             >
               Ir a mi cuenta
-            </a>
+            </Link>
           </li>
         </ul>
 
         {/* Botón Registrate */}
-        <button
-          type="button"
-          className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors w-full"
+        <Link
+          to="/register"
+          className="bg-white text-gray-900 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors w-full text-center"
         >
           Registrate
-        </button>
+        </Link>
       </div>
     </nav>
   );

@@ -6,7 +6,6 @@ import RegisterForm, {
 const Register = () => {
   const handleComplete = (data: RegisterFormData) => {
     console.log("Registro completo:", data);
-    // Aquí se conectará la llamada al backend (API) cuando esté lista.
   };
 
   return (
