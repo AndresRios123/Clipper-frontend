@@ -4,11 +4,11 @@ import DashboardHeader from "../components/SideBar/Dashboardheader";
 
 const DashboardLayout = () => {
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-auto">
+      <div className="ml-[220px] flex flex-col min-h-screen">
         <DashboardHeader />
-        <main className="flex-1 bg-gray-50">
+        <main className="flex-1 bg-gray-50 overflow-y-auto">
           <Outlet />
         </main>
       </div>

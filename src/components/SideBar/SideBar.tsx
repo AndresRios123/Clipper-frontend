@@ -27,7 +27,7 @@ const navItems: NavItem[] = [
 
 const Sidebar = () => {
   return (
-    <aside className="w-[220px] h-screen bg-[#00042C] flex flex-col flex-shrink-0">
+    <aside className="fixed left-0 top-0 w-[220px] h-screen bg-[#00042C] flex flex-col z-20">
       {/* Logo */}
       <div className="flex items-center gap-2 px-6 py-6">
         <svg

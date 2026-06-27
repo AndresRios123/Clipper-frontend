@@ -8,7 +8,7 @@ const DashboardHeader = ({
   userInitials = "BC",
 }: DashboardHeaderProps) => {
   return (
-    <header className="w-full bg-white px-8 py-4 flex items-center justify-end gap-3 border-b border-gray-100">
+    <header className="sticky top-0 z-10 w-full bg-white px-8 py-4 flex items-center justify-end gap-3 border-b border-gray-100">
       <span className="text-sm font-semibold text-gray-900">
         {businessName}
       </span>
