@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Filter, ChevronDown } from "lucide-react";
-import SearchInput from "./SearchInput";
+import SearchInput from "../SearchInput/SearchInput";
 
 const ClientsListSection = () => {
   const [searchTerm, setSearchTerm] = useState("");

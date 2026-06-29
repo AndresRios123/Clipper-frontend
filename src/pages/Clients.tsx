@@ -1,8 +1,12 @@
 import ClientsHeader from "../components/ClientsView/ClientsHeader";
+import ClientsListSection from "../components/ClientsView/ClientslistSection";
 
 const Clients = () => {
   return (
-    <ClientsHeader/>
+    <div>
+      <ClientsHeader/>
+      <ClientsListSection/>
+    </div>
   );
 };
 
