@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Phone, Mail, Eye, Pencil, Trash2 } from "lucide-react";
-import DataTable from "./DataTable";
-import type { Column } from "./DataTable";
+import DataTable from "../Datatable/DataTable";
+import type { Column } from "../Datatable/DataTable";
 
 // ---------- Tipo del dato ----------
 export type Client = {
