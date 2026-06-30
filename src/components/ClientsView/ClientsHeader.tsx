@@ -1,5 +1,5 @@
 import { Plus, Users, UserPlus, ClipboardList, Star } from "lucide-react";
-import StatCard from "./StatCard";
+import StatCard from "../StatCard/StatCard";
 
 type ClientsHeaderProps = {
   onNewClient?: () => void;
