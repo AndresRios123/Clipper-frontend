@@ -191,6 +191,7 @@ const CalendarView = () => {
   const [confirmMove, setConfirmMove] = useState<ConfirmMoveState | null>(null);
   const [daysState, setDaysState] = useState<DayColumn[]>(() => buildWeek(getMondayOfWeek(new Date(2026, 4, 20))));
   const dragRef = useRef<{ dayIndex: number; apptId: string } | null>(null);
+  const pointerInteraction = useRef<'mouse' | 'touch' | null>(null);
 
   const headerLabel = useMemo(() => getHeaderLabel(daysState), [daysState]);
 
@@ -545,6 +546,7 @@ const CalendarView = () => {
                   return (
                     <div
                       key={h}
+                      data-hour={h}
                       className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors text-sm border-b border-border last:border-b-0 ${
                         isInRange
                           ? "bg-clipper/15 text-clipper font-semibold"
@@ -552,8 +554,9 @@ const CalendarView = () => {
                       } ${isStart ? "rounded-t-lg" : ""} ${
                         isEnd ? "rounded-b-lg border-b-transparent" : ""
                       }`}
-                      onMouseDown={() => {
-                        // Primer click: fija startHour y entra en modo selección
+                      onPointerDown={(e) => {
+                        pointerInteraction.current = e.pointerType === 'touch' ? 'touch' : 'mouse';
+                        if (e.pointerType === 'touch') return;
                         if (!createModal.selecting) {
                           setCreateModal((prev) => ({
                             ...prev,
@@ -563,8 +566,8 @@ const CalendarView = () => {
                           }));
                         }
                       }}
-                      onMouseEnter={() => {
-                        // En modo selección, al pasar el mouse se actualiza endHour
+                      onPointerEnter={() => {
+                        if (pointerInteraction.current === 'touch') return;
                         if (createModal.selecting && h > createModal.startHour) {
                           setCreateModal((prev) => ({
                             ...prev,
@@ -572,13 +575,32 @@ const CalendarView = () => {
                           }));
                         }
                       }}
-                      onMouseUp={() => {
+                      onPointerUp={() => {
+                        if (pointerInteraction.current === 'touch') return;
+                        pointerInteraction.current = null;
                         if (createModal.selecting) {
-                          // Asegurar que endHour > startHour
                           setCreateModal((prev) => ({
                             ...prev,
                             startHour: Math.min(prev.startHour, prev.endHour - 1),
                             endHour: Math.max(prev.endHour, prev.startHour + 1),
+                            selecting: false,
+                          }));
+                        }
+                      }}
+                      onClick={() => {
+                        if (pointerInteraction.current !== 'touch') return;
+                        pointerInteraction.current = null;
+                        if (!createModal.selecting) {
+                          setCreateModal((prev) => ({
+                            ...prev,
+                            startHour: h,
+                            endHour: h + 1,
+                            selecting: true,
+                          }));
+                        } else if (h >= createModal.startHour) {
+                          setCreateModal((prev) => ({
+                            ...prev,
+                            endHour: Math.max(h + 1, prev.startHour + 1),
                             selecting: false,
                           }));
                         }
@@ -593,7 +615,7 @@ const CalendarView = () => {
                 })}
               </div>
               <p className="text-[10px] text-gray-400 mt-1.5 text-center">
-                Presiona y arrastra para seleccionar el rango
+                En PC: presiona y arrastra &middot; En celular: toca inicio y fin
               </p>
             </div>
 
