@@ -261,28 +261,50 @@ const CalendarView = () => {
             <div />
 
             {/* Encabezados de días */}
-            {days.map((day) => (
-              <div
-                key={day.date.toISOString()}
-                className="text-center pb-3 border-b border-gray-200"
-              >
-                <p className="text-xs font-semibold text-gray-700">
-                  {day.label}
-                </p>
-                <p className="text-xs text-gray-500">{day.date.getDate()}</p>
-              </div>
-            ))}
+            {days.map((day) => {
+              const isToday =
+                day.date.toDateString() === new Date().toDateString();
+              return (
+                <div
+                  key={day.date.toISOString()}
+                  className={`text-center pb-3 border-b border-border ${
+                    isToday ? "bg-[#7883FF]/5 rounded-t-lg" : ""
+                  }`}
+                >
+                  <span
+                    className={`text-xs font-semibold ${
+                      isToday
+                        ? "text-clipper"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {day.label}
+                  </span>
+                  <div
+                    className={`w-7 h-7 mx-auto mt-0.5 flex items-center justify-center rounded-full text-xs ${
+                      isToday
+                        ? "bg-clipper text-white font-bold"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {day.date.getDate()}
+                  </div>
+                </div>
+              );
+            })}
 
             {/* Columna de horas */}
             <div className="flex flex-col">
               {hours.map((hour) => (
-                <div
-                  key={hour}
-                  style={{ height: ROW_HEIGHT }}
-                  className="text-xs text-gray-500 border-b border-gray-100 -translate-y-2"
-                >
-                  {formatHourLabel(hour)}
-                </div>
+              <div
+                key={hour}
+                style={{ height: ROW_HEIGHT }}
+                className={`text-xs text-gray-500 border-b border-border -translate-y-2 ${
+                  hour % 2 === 0 ? "" : ""
+                }`}
+              >
+                {formatHourLabel(hour)}
+              </div>
               ))}
             </div>
 
@@ -290,16 +312,20 @@ const CalendarView = () => {
             {days.map((day) => (
               <div
                 key={day.date.toISOString()}
-                className="relative border-l border-gray-100"
+                className="relative border-l border-border"
                 style={{ height: ROW_HEIGHT * hours.length }}
               >
                 {/* Celdas de fondo: una por cada hora, con borde sutil y hover */}
                 <div className="absolute inset-0 flex flex-col">
-                  {hours.map((hour) => (
+                  {hours.map((hour, hIdx) => (
                     <div
                       key={hour}
                       style={{ height: ROW_HEIGHT }}
-                      className="border-b border-gray-100 hover:bg-gray-200/60 transition-colors"
+                      className={`border-b border-border transition-colors ${
+                        hIdx % 2 === 0
+                          ? "hover:bg-[#7883FF]/8"
+                          : "bg-[#F8F8FD] hover:bg-[#7883FF]/8"
+                      }`}
                       onMouseEnter={() =>
                         setHoveredCell({ dayLabel: day.label, hour, x: 0, y: 0 })
                       }

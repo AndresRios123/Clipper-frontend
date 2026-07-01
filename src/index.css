@@ -3,4 +3,8 @@
 
 @theme {
   --font-sans: "Plus Jakarta Sans", sans-serif;
+  --color-dashboard: #F4F5FA;
+  --color-border: #E8E8F0;
+  --color-clipper: #7883FF;
+  --color-clipper-light: #A2AAFF;
 }

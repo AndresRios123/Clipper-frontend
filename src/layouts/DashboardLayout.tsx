@@ -10,7 +10,7 @@ const DashboardLayout = () => {
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <DashboardHeader />
-          <main className="flex-1 bg-[#f3f3f3] overflow-y-auto">
+          <main className="flex-1 bg-dashboard overflow-y-auto">
             <Outlet />
           </main>
         </div>
