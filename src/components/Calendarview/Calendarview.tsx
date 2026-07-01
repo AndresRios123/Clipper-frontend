@@ -258,7 +258,7 @@ const CalendarView = () => {
           {/* Grid del calendario */}
           <div className="grid grid-cols-[60px_repeat(7,1fr)]">
             {/* Esquina vacía sobre la columna de horas */}
-            <div />
+            <div className="sticky left-0 z-10 bg-white border-r border-border" />
 
             {/* Encabezados de días */}
             {days.map((day) => {
@@ -294,7 +294,7 @@ const CalendarView = () => {
             })}
 
             {/* Columna de horas */}
-            <div className="flex flex-col">
+            <div className="sticky left-0 z-10 bg-white border-r border-border flex flex-col">
               {hours.map((hour) => (
               <div
                 key={hour}
