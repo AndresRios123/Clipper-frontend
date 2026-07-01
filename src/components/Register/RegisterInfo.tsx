@@ -34,11 +34,16 @@ const RegisterInfo = () => {
   return (
     <div className="w-full h-full bg-white flex flex-col justify-center px-10 lg:px-20 py-12">
       {/* Título */}
-      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-10">
+      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">
         Gestiona tu negocio
         <br />
         desde un solo lugar.
       </h1>
+      <p className="text-sm text-gray-500 mb-8 leading-snug">
+        Todo lo que necesitas para administrar tu barbería
+        <br />
+        en una sola plataforma.
+      </p>
 
       {/* Lista de features */}
       <ul className="flex flex-col gap-6">
@@ -56,6 +61,15 @@ const RegisterInfo = () => {
           </li>
         ))}
       </ul>
+
+      {/* Mockup */}
+      <div className="mt-10 flex justify-center">
+        <img
+          src="/mockups.png"
+          alt="Mockup de Clipper"
+          className="w-full max-w-[340px] lg:max-w-[380px]"
+        />
+      </div>
     </div>
   );
 };

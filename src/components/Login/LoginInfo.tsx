@@ -35,7 +35,7 @@ const LoginInfo = () => {
         <br />
         vuelta a Clipper
       </h1>
-      <p className="text-sm text-gray-500 mb-10 leading-snug">
+      <p className="text-sm text-gray-500 mb-8 leading-snug">
         Inicia sesión para continuar administrando
         <br />
         tu negocio de manera fácil y eficiente
@@ -57,6 +57,15 @@ const LoginInfo = () => {
           </li>
         ))}
       </ul>
+
+      {/* Mockup */}
+      <div className="mt-10 flex justify-center">
+        <img
+          src="/mockups.png"
+          alt="Mockup de Clipper"
+          className="w-full max-w-[340px] lg:max-w-[380px]"
+        />
+      </div>
     </div>
   );
 };
