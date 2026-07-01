@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 // Esquema de validación del paso 1 (datos de cuenta)
 const accountSchema = z
@@ -25,6 +27,9 @@ type AccountStepProps = {
 };
 
 const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -40,11 +45,14 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
   return (
     <div className="w-full h-full bg-[#A2AAFF] flex flex-col justify-center px-6 lg:px-20 py-20 md:py-12">
       {/* Título */}
-      <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-8">
+      <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
         Registrate, es 100%
         <br />
         gratis
       </h2>
+      <p className="text-sm text-white/80 mb-8">
+        Crea tu cuenta y empieza a gestionar tu negocio.
+      </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -54,12 +62,20 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
         {/* Nombre + Apellido */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <input
-              type="text"
-              placeholder="nombre"
-              {...register("nombre")}
-              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-            />
+            <label className="block text-white text-xs font-semibold mb-1">
+              Nombre
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <User size={16} />
+              </span>
+              <input
+                type="text"
+                placeholder="tu nombre"
+                {...register("nombre")}
+                className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+              />
+            </div>
             {errors.nombre && (
               <p className="text-xs text-red-100 mt-1">
                 {errors.nombre.message}
@@ -67,12 +83,20 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
             )}
           </div>
           <div>
-            <input
-              type="text"
-              placeholder="apellido"
-              {...register("apellido")}
-              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-            />
+            <label className="block text-white text-xs font-semibold mb-1">
+              Apellido
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <User size={16} />
+              </span>
+              <input
+                type="text"
+                placeholder="tu apellido"
+                {...register("apellido")}
+                className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+              />
+            </div>
             {errors.apellido && (
               <p className="text-xs text-red-100 mt-1">
                 {errors.apellido.message}
@@ -83,12 +107,20 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
 
         {/* Email */}
         <div>
-          <input
-            type="email"
-            placeholder="email"
-            {...register("email")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Email
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Mail size={16} />
+            </span>
+            <input
+              type="email"
+              placeholder="tucorreo@ejemplo.com"
+              {...register("email")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+          </div>
           {errors.email && (
             <p className="text-xs text-red-100 mt-1">{errors.email.message}</p>
           )}
@@ -96,12 +128,27 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
 
         {/* Contraseña */}
         <div>
-          <input
-            type="password"
-            placeholder="contraseña"
-            {...register("contrasena")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Contraseña
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Lock size={16} />
+            </span>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="mínimo 8 caracteres"
+              {...register("contrasena")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-10 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
           {errors.contrasena && (
             <p className="text-xs text-red-100 mt-1">
               {errors.contrasena.message}
@@ -111,12 +158,27 @@ const AccountStep = ({ onSubmitStep }: AccountStepProps) => {
 
         {/* Verificar contraseña */}
         <div>
-          <input
-            type="password"
-            placeholder="verifica tu contraseña"
-            {...register("verificarContrasena")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Verificar contraseña
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Lock size={16} />
+            </span>
+            <input
+              type={showVerifyPassword ? "text" : "password"}
+              placeholder="repite tu contraseña"
+              {...register("verificarContrasena")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-10 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+            <button
+              type="button"
+              onClick={() => setShowVerifyPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showVerifyPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
           {errors.verificarContrasena && (
             <p className="text-xs text-red-100 mt-1">
               {errors.verificarContrasena.message}

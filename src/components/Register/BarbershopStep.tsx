@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Store, MapPin, Phone, Mail } from "lucide-react";
 
 // Esquema de validación del paso 2 (datos de la barbería)
 const barbershopSchema = z.object({
@@ -37,13 +38,16 @@ const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
   };
 
   return (
-    <div className="w-full h-full bg-[#A2AAFF] flex flex-col justify-center px-10 lg:px-20 py-12">
+    <div className="w-full h-full bg-[#A2AAFF] flex flex-col justify-center px-6 lg:px-20 py-20 md:py-12">
       {/* Título */}
-      <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-8">
+      <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
         Cuéntanos de
         <br />
         tu barbería
       </h2>
+      <p className="text-sm text-white/80 mb-8">
+        Los datos de tu negocio para que tus clientes te encuentren.
+      </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -52,12 +56,20 @@ const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
       >
         {/* Nombre de la barbería */}
         <div>
-          <input
-            type="text"
-            placeholder="nombre de la barbería"
-            {...register("nombreBarberia")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Nombre de la barbería
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Store size={16} />
+            </span>
+            <input
+              type="text"
+              placeholder="ej: Clipper Barber Shop"
+              {...register("nombreBarberia")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+          </div>
           {errors.nombreBarberia && (
             <p className="text-xs text-red-100 mt-1">
               {errors.nombreBarberia.message}
@@ -67,12 +79,20 @@ const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
 
         {/* Dirección */}
         <div>
-          <input
-            type="text"
-            placeholder="dirección"
-            {...register("direccion")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Dirección
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <MapPin size={16} />
+            </span>
+            <input
+              type="text"
+              placeholder="calle, número, colonia"
+              {...register("direccion")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+          </div>
           {errors.direccion && (
             <p className="text-xs text-red-100 mt-1">
               {errors.direccion.message}
@@ -82,12 +102,20 @@ const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
 
         {/* Teléfono */}
         <div>
-          <input
-            type="tel"
-            placeholder="teléfono"
-            {...register("telefono")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Teléfono
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Phone size={16} />
+            </span>
+            <input
+              type="tel"
+              placeholder="+52 55 1234 5678"
+              {...register("telefono")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+          </div>
           {errors.telefono && (
             <p className="text-xs text-red-100 mt-1">
               {errors.telefono.message}
@@ -97,12 +125,20 @@ const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
 
         {/* Email de la barbería */}
         <div>
-          <input
-            type="email"
-            placeholder="email"
-            {...register("emailBarberia")}
-            className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-500 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-white"
-          />
+          <label className="block text-white text-xs font-semibold mb-1">
+            Email
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Mail size={16} />
+            </span>
+            <input
+              type="email"
+              placeholder="barberia@ejemplo.com"
+              {...register("emailBarberia")}
+              className="w-full bg-[#E6E6E6] text-gray-800 placeholder-gray-400 text-sm rounded-lg pl-9 pr-4 py-3 outline-none focus:ring-2 focus:ring-white"
+            />
+          </div>
           {errors.emailBarberia && (
             <p className="text-xs text-red-100 mt-1">
               {errors.emailBarberia.message}
