@@ -52,14 +52,6 @@ const formatHourLabel = (hour: number) => {
   return `${display}:00`;
 };
 
-const formatHourRangeLabel = (hour: number) => {
-  const period = (h: number) => (h >= 12 ? "pm" : "am");
-  const display = (h: number) => (h > 12 ? h - 12 : h === 0 ? 12 : h);
-  return `${display(hour)}:00 ${period(hour)} - ${display(hour + 1)}:00 ${period(
-    hour + 1
-  )}`;
-};
-
 // Devuelve el lunes de la semana a la que pertenece `date`
 const getMondayOfWeek = (date: Date) => {
   const result = new Date(date);
@@ -232,11 +224,11 @@ const CalendarView = () => {
 
   const moveAppointment = (apptId: string, fromDayIndex: number, toDayIndex: number, toHour: number) => {
     setDaysState((prev) => {
-      const fromDay = prev[fromDayIndex];
-      const apptToMove = fromDay.appointments.find((a) => a.id === apptId);
+      const fromDay: DayColumn = prev[fromDayIndex];
+      const apptToMove: Appointment | undefined = fromDay.appointments.find((a) => a.id === apptId);
       if (!apptToMove) return prev;
 
-      const next = prev.map((day, i) => {
+      const next: DayColumn[] = prev.map((day, i) => {
         if (i === fromDayIndex) {
           return { ...day, appointments: day.appointments.filter((a) => a.id !== apptId) };
         }
@@ -244,10 +236,11 @@ const CalendarView = () => {
       });
 
       const duration = apptToMove.endHour - apptToMove.startHour;
+      const targetDay: DayColumn = next[toDayIndex];
       next[toDayIndex] = {
-        ...next[toDayIndex],
+        ...targetDay,
         appointments: [
-          ...next[toDayIndex].appointments,
+          ...targetDay.appointments,
           { ...apptToMove, startHour: toHour, endHour: toHour + duration },
         ],
       };
