@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Filter, ChevronDown } from "lucide-react";
 import SearchInput from "../SearchInput/SearchInput";
+import ClientsTable from "./ClientsTable";
 
 const ClientsListSection = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,7 +34,8 @@ const ClientsListSection = () => {
         </button>
       </div>
 
-      {/* Aquí va la tabla de clientes + paginación (siguiente paso) */}
+      {/* Tabla de clientes + paginación */}
+      <ClientsTable />
     </div>
   );
 };

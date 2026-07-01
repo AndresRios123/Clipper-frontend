@@ -1,13 +1,11 @@
 import ClientsHeader from "../components/ClientsView/ClientsHeader";
 import ClientsListSection from "../components/ClientsView/ClientslistSection";
-import ClientsTable from "../components/ClientsView/ClientsTable";
 
 const Clients = () => {
   return (
-    <div>
-      <ClientsHeader/>
-      <ClientsListSection/>
-      <ClientsTable/>
+    <div className="p-6 flex flex-col gap-6">
+      <ClientsHeader />
+      <ClientsListSection />
     </div>
   );
 };
