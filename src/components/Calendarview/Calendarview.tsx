@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
+import { ChevronLeft, ChevronRight, Plus, X, Move } from "lucide-react";
 
 // ---------- Tipos ----------
 type AppointmentColor = "green" | "blue" | "orange";
@@ -177,6 +177,14 @@ const getHeaderLabel = (days: DayColumn[]) => {
   return `${MONTH_NAMES[firstMonth]} / ${MONTH_NAMES[lastMonth]} ${lastYear}`;
 };
 
+type ConfirmMoveState = {
+  appt: Appointment;
+  fromDayIndex: number;
+  fromHour: number;
+  toDayIndex: number;
+  toHour: number;
+};
+
 const CalendarView = () => {
   const [currentMonday, setCurrentMonday] = useState(() =>
     getMondayOfWeek(new Date(2026, 4, 20))
@@ -186,7 +194,9 @@ const CalendarView = () => {
   const [hoveredDayHour, setHoveredDayHour] = useState<{ dayIndex: number; hour: number } | null>(null);
   const [hoveredApptId, setHoveredApptId] = useState<string | null>(null);
   const [createModal, setCreateModal] = useState<CreateModalState>({ open: false, dayIndex: 0, hour: 8 });
+  const [confirmMove, setConfirmMove] = useState<ConfirmMoveState | null>(null);
   const [daysState, setDaysState] = useState<DayColumn[]>(() => buildWeek(getMondayOfWeek(new Date(2026, 4, 20))));
+  const dragRef = useRef<{ dayIndex: number; apptId: string } | null>(null);
 
   const headerLabel = useMemo(() => getHeaderLabel(daysState), [daysState]);
 
@@ -216,6 +226,67 @@ const CalendarView = () => {
       });
       return next;
     });
+  };
+
+  const moveAppointment = (apptId: string, fromDayIndex: number, toDayIndex: number, toHour: number) => {
+    setDaysState((prev) => {
+      let apptToMove: Appointment | null = null;
+      const next = prev.map((day, i) => {
+        if (i === fromDayIndex) {
+          const filtered = day.appointments.filter((a) => a.id !== apptId);
+          apptToMove = day.appointments.find((a) => a.id === apptId) || null;
+          return { ...day, appointments: filtered };
+        }
+        return day;
+      });
+      if (apptToMove) {
+        const duration = apptToMove.endHour - apptToMove.startHour;
+        next[toDayIndex] = {
+          ...next[toDayIndex],
+          appointments: [
+            ...next[toDayIndex].appointments,
+            { ...apptToMove, startHour: toHour, endHour: toHour + duration },
+          ],
+        };
+      }
+      return next;
+    });
+    setConfirmMove(null);
+  };
+
+  const handleDragStart = (e: React.DragEvent, dayIndex: number, apptId: string) => {
+    dragRef.current = { dayIndex, apptId };
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", apptId);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, toDayIndex: number, toHour: number) => {
+    e.preventDefault();
+    const dragData = dragRef.current;
+    if (!dragData) return;
+
+    const appt = daysState[dragData.dayIndex]?.appointments.find(
+      (a) => a.id === dragData.apptId
+    );
+    if (!appt) return;
+
+    const isSamePosition =
+      dragData.dayIndex === toDayIndex && appt.startHour === toHour;
+    if (isSamePosition) return;
+
+    setConfirmMove({
+      appt,
+      fromDayIndex: dragData.dayIndex,
+      fromHour: appt.startHour,
+      toDayIndex,
+      toHour,
+    });
+    dragRef.current = null;
   };
 
   const addAppointment = (dayIndex: number, hour: number, clientName: string) => {
@@ -355,6 +426,8 @@ const CalendarView = () => {
                             : "bg-[#F8F8FD] hover:bg-[#7883FF]/8"
                         }`}
                         onMouseEnter={() => setHoveredDayHour({ dayIndex: dIdx, hour })}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, dIdx, hour)}
                       >
                         {/* Botón "+" para agregar cita en celda vacía */}
                         {isHovered && !hasAppt && (
@@ -384,13 +457,22 @@ const CalendarView = () => {
                   return (
                     <div
                       key={appt.id}
-                      className={`absolute left-1 right-1 rounded-lg px-2 py-1.5 overflow-hidden transition-shadow ${
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, dIdx, appt.id)}
+                      className={`absolute left-1 right-1 rounded-lg px-2 py-1.5 overflow-hidden transition-shadow cursor-grab active:cursor-grabbing ${
                         isHoveredAppt ? "shadow-lg ring-2 ring-white/50 z-20" : ""
                       }`}
                       style={{ top, height, backgroundColor: styles.bg }}
                       onMouseEnter={() => setHoveredApptId(appt.id)}
                       onMouseLeave={() => setHoveredApptId(null)}
                     >
+                      {/* Indicador de arrastre */}
+                      {isHoveredAppt && (
+                        <div className="absolute top-1 left-1 text-white/60">
+                          <Move size={10} />
+                        </div>
+                      )}
+
                       {/* Botón eliminar en hover */}
                       {isHoveredAppt && (
                         <button
@@ -485,6 +567,72 @@ const CalendarView = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para mover cita */}
+      {confirmMove && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => setConfirmMove(null)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-sm mx-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Mover cita</h3>
+              <button
+                type="button"
+                onClick={() => setConfirmMove(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-3 text-sm text-gray-600 mb-6">
+              <p className="font-semibold text-gray-900">{confirmMove.appt.clientName}</p>
+
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">De:</span>
+                <span className="bg-gray-100 px-2.5 py-1 rounded-md text-gray-700 font-medium">
+                  {daysState[confirmMove.fromDayIndex]?.label} · {formatHourLabel(confirmMove.fromHour)}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500">A:</span>
+                <span className="bg-[#7883FF]/10 px-2.5 py-1 rounded-md text-clipper font-medium">
+                  {daysState[confirmMove.toDayIndex]?.label} · {formatHourLabel(confirmMove.toHour)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setConfirmMove(null)}
+                className="text-sm font-medium text-gray-500 px-4 py-2.5 hover:text-gray-700 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  moveAppointment(
+                    confirmMove.appt.id,
+                    confirmMove.fromDayIndex,
+                    confirmMove.toDayIndex,
+                    confirmMove.toHour
+                  )
+                }
+                className="bg-clipper text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-[#6670e8] transition-colors"
+              >
+                Confirmar
+              </button>
+            </div>
           </div>
         </div>
       )}
