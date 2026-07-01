@@ -159,7 +159,9 @@ const ROW_HEIGHT = 40; // alto en px de cada fila de 1 hora
 type CreateModalState = {
   open: boolean;
   dayIndex: number;
-  hour: number;
+  startHour: number;
+  endHour: number;
+  selecting: boolean;
 };
 
 // Etiqueta del header: muestra el mes (y año) considerando que la semana
@@ -193,7 +195,7 @@ const CalendarView = () => {
   const [animationKey, setAnimationKey] = useState(0);
   const [hoveredDayHour, setHoveredDayHour] = useState<{ dayIndex: number; hour: number } | null>(null);
   const [hoveredApptId, setHoveredApptId] = useState<string | null>(null);
-  const [createModal, setCreateModal] = useState<CreateModalState>({ open: false, dayIndex: 0, hour: 8 });
+  const [createModal, setCreateModal] = useState<CreateModalState>({ open: false, dayIndex: 0, startHour: 8, endHour: 9, selecting: false });
   const [confirmMove, setConfirmMove] = useState<ConfirmMoveState | null>(null);
   const [daysState, setDaysState] = useState<DayColumn[]>(() => buildWeek(getMondayOfWeek(new Date(2026, 4, 20))));
   const dragRef = useRef<{ dayIndex: number; apptId: string } | null>(null);
@@ -230,25 +232,25 @@ const CalendarView = () => {
 
   const moveAppointment = (apptId: string, fromDayIndex: number, toDayIndex: number, toHour: number) => {
     setDaysState((prev) => {
-      let apptToMove: Appointment | null = null;
+      const fromDay = prev[fromDayIndex];
+      const apptToMove = fromDay.appointments.find((a) => a.id === apptId);
+      if (!apptToMove) return prev;
+
       const next = prev.map((day, i) => {
         if (i === fromDayIndex) {
-          const filtered = day.appointments.filter((a) => a.id !== apptId);
-          apptToMove = day.appointments.find((a) => a.id === apptId) || null;
-          return { ...day, appointments: filtered };
+          return { ...day, appointments: day.appointments.filter((a) => a.id !== apptId) };
         }
         return day;
       });
-      if (apptToMove) {
-        const duration = apptToMove.endHour - apptToMove.startHour;
-        next[toDayIndex] = {
-          ...next[toDayIndex],
-          appointments: [
-            ...next[toDayIndex].appointments,
-            { ...apptToMove, startHour: toHour, endHour: toHour + duration },
-          ],
-        };
-      }
+
+      const duration = apptToMove.endHour - apptToMove.startHour;
+      next[toDayIndex] = {
+        ...next[toDayIndex],
+        appointments: [
+          ...next[toDayIndex].appointments,
+          { ...apptToMove, startHour: toHour, endHour: toHour + duration },
+        ],
+      };
       return next;
     });
     setConfirmMove(null);
@@ -289,13 +291,13 @@ const CalendarView = () => {
     dragRef.current = null;
   };
 
-  const addAppointment = (dayIndex: number, hour: number, clientName: string) => {
+  const addAppointment = (dayIndex: number, startHour: number, endHour: number, clientName: string) => {
     const colors: AppointmentColor[] = ["green", "blue", "orange"];
     const newAppt: Appointment = {
       id: `manual-${Date.now()}`,
       clientName,
-      startHour: hour,
-      endHour: hour + 1,
+      startHour,
+      endHour,
       color: colors[Math.floor(Math.random() * colors.length)],
     };
     setDaysState((prev) => {
@@ -305,7 +307,7 @@ const CalendarView = () => {
       });
       return next;
     });
-    setCreateModal({ open: false, dayIndex: 0, hour: 8 });
+    setCreateModal({ open: false, dayIndex: 0, startHour: 8, endHour: 9, selecting: false });
   };
 
   return (
@@ -433,7 +435,7 @@ const CalendarView = () => {
                         {isHovered && !hasAppt && (
                           <button
                             type="button"
-                            onClick={() => setCreateModal({ open: true, dayIndex: dIdx, hour })}
+                            onClick={() => setCreateModal({ open: true, dayIndex: dIdx, startHour: hour, endHour: hour + 1, selecting: false })}
                             className="absolute inset-0 flex items-center justify-center z-20 transition-all"
                           >
                             <span className="flex items-center gap-1 bg-clipper text-white text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-md hover:bg-[#6670e8] transition-colors">
@@ -510,27 +512,97 @@ const CalendarView = () => {
       {createModal.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-          onClick={() => setCreateModal({ open: false, dayIndex: 0, hour: 8 })}
+          onClick={() =>
+            setCreateModal({ open: false, dayIndex: 0, startHour: 8, endHour: 9, selecting: false })
+          }
         >
           <div
             className="bg-white rounded-2xl p-6 w-full max-w-sm mx-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-bold text-gray-900">Nueva cita</h3>
               <button
                 type="button"
-                onClick={() => setCreateModal({ open: false, dayIndex: 0, hour: 8 })}
+                onClick={() =>
+                  setCreateModal({ open: false, dayIndex: 0, startHour: 8, endHour: 9, selecting: false })
+                }
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X size={18} />
               </button>
             </div>
 
+            {/* Día + rango horario seleccionado */}
             <p className="text-sm text-gray-500 mb-4">
               {daysState[createModal.dayIndex]?.label} ·{" "}
-              {formatHourRangeLabel(createModal.hour)}
+              <span className="text-clipper font-semibold">
+                {formatHourLabel(createModal.startHour)} - {formatHourLabel(createModal.endHour)}
+              </span>
             </p>
+
+            {/* Selector interactivo de horas (deslizable) */}
+            <div className="relative mb-4 select-none">
+              <div className="max-h-[240px] overflow-y-auto rounded-xl border border-border">
+                {hours.map((h) => {
+                  const isInRange = h >= createModal.startHour && h < createModal.endHour;
+                  const isStart = h === createModal.startHour;
+                  const isEnd = h === createModal.endHour;
+
+                  return (
+                    <div
+                      key={h}
+                      className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors text-sm border-b border-border last:border-b-0 ${
+                        isInRange
+                          ? "bg-clipper/15 text-clipper font-semibold"
+                          : "hover:bg-gray-50 text-gray-700"
+                      } ${isStart ? "rounded-t-lg" : ""} ${
+                        isEnd ? "rounded-b-lg border-b-transparent" : ""
+                      }`}
+                      onMouseDown={() => {
+                        // Primer click: fija startHour y entra en modo selección
+                        if (!createModal.selecting) {
+                          setCreateModal((prev) => ({
+                            ...prev,
+                            startHour: h,
+                            endHour: h + 1,
+                            selecting: true,
+                          }));
+                        }
+                      }}
+                      onMouseEnter={() => {
+                        // En modo selección, al pasar el mouse se actualiza endHour
+                        if (createModal.selecting && h > createModal.startHour) {
+                          setCreateModal((prev) => ({
+                            ...prev,
+                            endHour: h + 1,
+                          }));
+                        }
+                      }}
+                      onMouseUp={() => {
+                        if (createModal.selecting) {
+                          // Asegurar que endHour > startHour
+                          setCreateModal((prev) => ({
+                            ...prev,
+                            startHour: Math.min(prev.startHour, prev.endHour - 1),
+                            endHour: Math.max(prev.endHour, prev.startHour + 1),
+                            selecting: false,
+                          }));
+                        }
+                      }}
+                    >
+                      <span>{formatHourLabel(h)}</span>
+                      {isInRange && (
+                        <span className="w-2 h-2 rounded-full bg-clipper" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-gray-400 mt-1.5 text-center">
+                Presiona y arrastra para seleccionar el rango
+              </p>
+            </div>
 
             <form
               onSubmit={(e) => {
@@ -538,7 +610,12 @@ const CalendarView = () => {
                 const form = e.target as HTMLFormElement;
                 const input = form.elements.namedItem("clientName") as HTMLInputElement;
                 if (input.value.trim()) {
-                  addAppointment(createModal.dayIndex, createModal.hour, input.value.trim());
+                  addAppointment(
+                    createModal.dayIndex,
+                    createModal.startHour,
+                    createModal.endHour,
+                    input.value.trim()
+                  );
                 }
               }}
               className="flex flex-col gap-4"
@@ -554,7 +631,9 @@ const CalendarView = () => {
               <div className="flex gap-3 justify-end">
                 <button
                   type="button"
-                  onClick={() => setCreateModal({ open: false, dayIndex: 0, hour: 8 })}
+                  onClick={() =>
+                    setCreateModal({ open: false, dayIndex: 0, startHour: 8, endHour: 9, selecting: false })
+                  }
                   className="text-sm font-medium text-gray-500 px-4 py-2.5 hover:text-gray-700 transition-colors"
                 >
                   Cancelar
