@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 
 // ---------- Tipos ----------
 type AppointmentColor = "green" | "blue" | "orange";
@@ -156,11 +156,10 @@ const colorStyles: Record<AppointmentColor, { bg: string; text: string }> = {
 
 const ROW_HEIGHT = 40; // alto en px de cada fila de 1 hora
 
-type HoveredCell = {
-  dayLabel: string;
+type CreateModalState = {
+  open: boolean;
+  dayIndex: number;
   hour: number;
-  x: number;
-  y: number;
 };
 
 // Etiqueta del header: muestra el mes (y año) considerando que la semana
@@ -179,31 +178,24 @@ const getHeaderLabel = (days: DayColumn[]) => {
 };
 
 const CalendarView = () => {
-  // Ancla inicial: el lunes de la semana del 20 de mayo de 2026 (donde están
-  // los datos de demo). Cambia esto a `new Date()` si quieres que abra
-  // siempre en la semana actual real.
   const [currentMonday, setCurrentMonday] = useState(() =>
     getMondayOfWeek(new Date(2026, 4, 20))
   );
-  const [hoveredCell, setHoveredCell] = useState<HoveredCell | null>(null);
-  // Dirección del último cambio de semana, usada para animar el slide:
-  // "forward" = la semana nueva entra desde la derecha (avanzar)
-  // "backward" = la semana nueva entra desde la izquierda (retroceder)
-  const [direction, setDirection] = useState<"forward" | "backward">(
-    "forward"
-  );
-  // Cambia junto con currentMonday para forzar que React remonte el bloque
-  // de la semana y dispare la animación de entrada cada vez
+  const [direction, setDirection] = useState<"forward" | "backward">("forward");
   const [animationKey, setAnimationKey] = useState(0);
+  const [hoveredDayHour, setHoveredDayHour] = useState<{ dayIndex: number; hour: number } | null>(null);
+  const [hoveredApptId, setHoveredApptId] = useState<string | null>(null);
+  const [createModal, setCreateModal] = useState<CreateModalState>({ open: false, dayIndex: 0, hour: 8 });
+  const [daysState, setDaysState] = useState<DayColumn[]>(() => buildWeek(getMondayOfWeek(new Date(2026, 4, 20))));
 
-  const days = useMemo(() => buildWeek(currentMonday), [currentMonday]);
-  const headerLabel = useMemo(() => getHeaderLabel(days), [days]);
+  const headerLabel = useMemo(() => getHeaderLabel(daysState), [daysState]);
 
   const goToPreviousWeek = () => {
     const prev = new Date(currentMonday);
     prev.setDate(prev.getDate() - 7);
     setDirection("backward");
     setCurrentMonday(prev);
+    setDaysState(buildWeek(prev));
     setAnimationKey((k) => k + 1);
   };
 
@@ -212,7 +204,37 @@ const CalendarView = () => {
     next.setDate(next.getDate() + 7);
     setDirection("forward");
     setCurrentMonday(next);
+    setDaysState(buildWeek(next));
     setAnimationKey((k) => k + 1);
+  };
+
+  const deleteAppointment = (dayIndex: number, apptId: string) => {
+    setDaysState((prev) => {
+      const next = prev.map((day, i) => {
+        if (i !== dayIndex) return day;
+        return { ...day, appointments: day.appointments.filter((a) => a.id !== apptId) };
+      });
+      return next;
+    });
+  };
+
+  const addAppointment = (dayIndex: number, hour: number, clientName: string) => {
+    const colors: AppointmentColor[] = ["green", "blue", "orange"];
+    const newAppt: Appointment = {
+      id: `manual-${Date.now()}`,
+      clientName,
+      startHour: hour,
+      endHour: hour + 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    };
+    setDaysState((prev) => {
+      const next = prev.map((day, i) => {
+        if (i !== dayIndex) return day;
+        return { ...day, appointments: [...day.appointments, newAppt] };
+      });
+      return next;
+    });
+    setCreateModal({ open: false, dayIndex: 0, hour: 8 });
   };
 
   return (
@@ -261,7 +283,7 @@ const CalendarView = () => {
             <div className="sticky left-0 z-10 bg-white border-r border-border" />
 
             {/* Encabezados de días */}
-            {days.map((day) => {
+            {daysState.map((day) => {
               const isToday =
                 day.date.toDateString() === new Date().toDateString();
               return (
@@ -309,37 +331,47 @@ const CalendarView = () => {
             </div>
 
             {/* Columnas de días con sus citas */}
-            {days.map((day) => (
+            {daysState.map((day, dIdx) => (
               <div
                 key={day.date.toISOString()}
-                className="relative border-l border-border"
+                className="relative border-l border-border group"
                 style={{ height: ROW_HEIGHT * hours.length }}
+                onMouseLeave={() => setHoveredDayHour(null)}
               >
                 {/* Celdas de fondo: una por cada hora, con borde sutil y hover */}
                 <div className="absolute inset-0 flex flex-col">
-                  {hours.map((hour, hIdx) => (
-                    <div
-                      key={hour}
-                      style={{ height: ROW_HEIGHT }}
-                      className={`border-b border-border transition-colors ${
-                        hIdx % 2 === 0
-                          ? "hover:bg-[#7883FF]/8"
-                          : "bg-[#F8F8FD] hover:bg-[#7883FF]/8"
-                      }`}
-                      onMouseEnter={() =>
-                        setHoveredCell({ dayLabel: day.label, hour, x: 0, y: 0 })
-                      }
-                      onMouseMove={(e) =>
-                        setHoveredCell({
-                          dayLabel: day.label,
-                          hour,
-                          x: e.clientX,
-                          y: e.clientY,
-                        })
-                      }
-                      onMouseLeave={() => setHoveredCell(null)}
-                    />
-                  ))}
+                  {hours.map((hour, hIdx) => {
+                    const isHovered = hoveredDayHour?.dayIndex === dIdx && hoveredDayHour?.hour === hour;
+                    const hasAppt = day.appointments.some(
+                      (a) => hour >= a.startHour && hour < a.endHour
+                    );
+                    return (
+                      <div
+                        key={hour}
+                        style={{ height: ROW_HEIGHT }}
+                        className={`relative border-b border-border transition-colors ${
+                          hIdx % 2 === 0
+                            ? "hover:bg-[#7883FF]/8"
+                            : "bg-[#F8F8FD] hover:bg-[#7883FF]/8"
+                        }`}
+                        onMouseEnter={() => setHoveredDayHour({ dayIndex: dIdx, hour })}
+                      >
+                        {/* Botón "+" para agregar cita en celda vacía */}
+                        {isHovered && !hasAppt && (
+                          <button
+                            type="button"
+                            onClick={() => setCreateModal({ open: true, dayIndex: dIdx, hour })}
+                            className="absolute inset-0 flex items-center justify-center z-20 transition-all"
+                          >
+                            <span className="flex items-center gap-1 bg-clipper text-white text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-md hover:bg-[#6670e8] transition-colors">
+                              <Plus size={10} />
+                              Agendar
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Citas, posicionadas encima de las celdas */}
@@ -347,17 +379,29 @@ const CalendarView = () => {
                   const top = (appt.startHour - START_HOUR) * ROW_HEIGHT;
                   const height = (appt.endHour - appt.startHour) * ROW_HEIGHT;
                   const styles = colorStyles[appt.color];
+                  const isHoveredAppt = hoveredApptId === appt.id;
 
                   return (
                     <div
                       key={appt.id}
-                      className="absolute left-1 right-1 rounded-lg px-2 py-1.5 overflow-hidden pointer-events-none"
-                      style={{
-                        top,
-                        height,
-                        backgroundColor: styles.bg,
-                      }}
+                      className={`absolute left-1 right-1 rounded-lg px-2 py-1.5 overflow-hidden transition-shadow ${
+                        isHoveredAppt ? "shadow-lg ring-2 ring-white/50 z-20" : ""
+                      }`}
+                      style={{ top, height, backgroundColor: styles.bg }}
+                      onMouseEnter={() => setHoveredApptId(appt.id)}
+                      onMouseLeave={() => setHoveredApptId(null)}
                     >
+                      {/* Botón eliminar en hover */}
+                      {isHoveredAppt && (
+                        <button
+                          type="button"
+                          onClick={() => deleteAppointment(dIdx, appt.id)}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/20 flex items-center justify-center hover:bg-black/40 transition-colors"
+                        >
+                          <X size={10} className="text-white" />
+                        </button>
+                      )}
+
                       <p
                         className="text-xs font-semibold leading-tight"
                         style={{ color: styles.text }}
@@ -380,16 +424,68 @@ const CalendarView = () => {
         </div>
       </div>
 
-      {/* Tooltip flotante que sigue al cursor */}
-      {hoveredCell && (
+      {/* Modal para crear cita */}
+      {createModal.open && (
         <div
-          className="fixed z-50 pointer-events-none bg-gray-900 text-white text-xs font-medium px-2.5 py-1.5 rounded-md shadow-lg"
-          style={{
-            left: hoveredCell.x + 12,
-            top: hoveredCell.y + 12,
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+          onClick={() => setCreateModal({ open: false, dayIndex: 0, hour: 8 })}
         >
-          {hoveredCell.dayLabel} · {formatHourRangeLabel(hoveredCell.hour)}
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-sm mx-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Nueva cita</h3>
+              <button
+                type="button"
+                onClick={() => setCreateModal({ open: false, dayIndex: 0, hour: 8 })}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-500 mb-4">
+              {daysState[createModal.dayIndex]?.label} ·{" "}
+              {formatHourRangeLabel(createModal.hour)}
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const input = form.elements.namedItem("clientName") as HTMLInputElement;
+                if (input.value.trim()) {
+                  addAppointment(createModal.dayIndex, createModal.hour, input.value.trim());
+                }
+              }}
+              className="flex flex-col gap-4"
+            >
+              <input
+                name="clientName"
+                type="text"
+                placeholder="Nombre del cliente"
+                autoFocus
+                className="w-full bg-gray-100 text-gray-800 placeholder-gray-400 text-sm rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-clipper"
+              />
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setCreateModal({ open: false, dayIndex: 0, hour: 8 })}
+                  className="text-sm font-medium text-gray-500 px-4 py-2.5 hover:text-gray-700 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="bg-clipper text-white text-sm font-semibold rounded-full px-5 py-2.5 hover:bg-[#6670e8] transition-colors"
+                >
+                  Agendar
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
