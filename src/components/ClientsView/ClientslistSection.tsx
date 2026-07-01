@@ -9,33 +9,40 @@ const ClientsListSection = () => {
   return (
     <div className="bg-white rounded-2xl p-6 flex flex-col gap-4">
       {/* Barra de búsqueda + filtros + ordenar */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <SearchInput
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder="Buscar cliente por nombre, teléfono o correo..."
-          className="flex-1"
+          className="flex-1 min-w-0"
         />
 
-        <button
-          type="button"
-          className="flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
-        >
-          <Filter size={16} />
-          Filtros
-        </button>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            type="button"
+            className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Filter size={16} />
+            <span className="hidden sm:inline">Filtros</span>
+          </button>
 
-        <button
-          type="button"
-          className="flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex-shrink-0"
-        >
-          Ordenar: Más recientes
-          <ChevronDown size={16} />
-        </button>
+          <button
+            type="button"
+            className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <span className="hidden sm:inline">Ordenar: Más recientes</span>
+            <span className="sm:hidden">Ordenar</span>
+            <ChevronDown size={16} />
+          </button>
+        </div>
       </div>
 
-      {/* Tabla de clientes + paginación */}
-      <ClientsTable />
+      {/* Tabla de clientes + paginación:
+          -mx-6 px-6 permite que el scroll horizontal use todo el ancho
+          de la tarjeta sin quedar recortado por el rounded-2xl del padre */}
+      <div className="-mx-6 px-6">
+        <ClientsTable />
+      </div>
     </div>
   );
 };
