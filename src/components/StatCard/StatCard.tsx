@@ -20,16 +20,16 @@ const StatCard = ({
   const isPositive = changePercentage >= 0;
 
   return (
-    <div className="bg-white rounded-2xl p-4 flex items-start gap-3">
+    <div className="bg-white rounded-2xl p-4 flex flex-col md:flex-row md:items-start gap-3">
       <div
-        className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+        className="w-9 h-9 md:w-11 md:h-11 rounded-xl flex items-center justify-center flex-shrink-0"
         style={{ backgroundColor: iconBgColor }}
       >
         {icon}
       </div>
 
-      <div className="flex flex-col min-w-0">
-        <p className="text-xs text-gray-500 truncate">{label}</p>
+      <div className="flex flex-col">
+        <p className="text-xs text-gray-500">{label}</p>
         <p className="text-lg md:text-xl font-bold text-gray-900">{value}</p>
         <p className="text-xs text-gray-500">
           <span
