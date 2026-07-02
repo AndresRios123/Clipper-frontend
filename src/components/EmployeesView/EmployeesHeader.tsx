@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Users, UserCheck, Scissors, Shield } from "lucide-react";
 import SearchInput from "../SearchInput/SearchInput";
+import StatCard from "../StatCard/StatCard";
 
 type EmployeesHeaderProps = {
   onNewEmployee?: () => void;
@@ -10,7 +11,7 @@ const EmployeesHeader = ({ onNewEmployee }: EmployeesHeaderProps) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
-    <div className="bg-white rounded-2xl p-6">
+    <div className="bg-white rounded-2xl p-6 flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Empleados</h1>
@@ -35,6 +36,38 @@ const EmployeesHeader = ({ onNewEmployee }: EmployeesHeaderProps) => {
             Nuevo empleado
           </button>
         </div>
+      </div>
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={<Users size={20} style={{ color: "#723AF3" }} />}
+          iconBgColor="#BFBDED"
+          label="Total empleados"
+          value={8}
+          bottomLabel="En total"
+        />
+        <StatCard
+          icon={<UserCheck size={20} style={{ color: "#0C7D31" }} />}
+          iconBgColor="#C3E2CC"
+          label="Empleados activos"
+          value={6}
+          bottomLabel="% del total"
+        />
+        <StatCard
+          icon={<Scissors size={20} style={{ color: "#B57600" }} />}
+          iconBgColor="#E9CB93"
+          label="Barberos"
+          value={5}
+          bottomLabel="Prestan servicios"
+        />
+        <StatCard
+          icon={<Shield size={20} style={{ color: "#2563EB" }} />}
+          iconBgColor="#BFDBFE"
+          label="Administradores"
+          value={3}
+          bottomLabel="Acceso completo"
+        />
       </div>
     </div>
   );
