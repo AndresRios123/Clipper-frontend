@@ -7,4 +7,14 @@
   --color-border: #E8E8F0;
   --color-clipper: #7883FF;
   --color-clipper-light: #A2AAFF;
+  --animate-slide-in: slide-in 0.25s ease-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
