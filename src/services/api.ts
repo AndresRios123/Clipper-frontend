@@ -28,3 +28,26 @@ async function request<T>(
 
   return data;
 }
+
+
+// ---- Auht ----
+
+export type LoginResponse = {
+  _id: string;
+  nombre: string;
+  email: string;
+  rol: "admin" | "barbero";
+  token: string;
+}
+
+export type LoginParams = {
+  email: string;
+  password: string;
+}
+
+export function login(params: LoginParams) {
+  return request<LoginResponse>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(params),
+  })
+}
