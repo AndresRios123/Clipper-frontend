@@ -1,20 +1,9 @@
 import { useState } from "react";
 import { Share2, CalendarPlus, Check } from "lucide-react";
 import CalendarView from "../components/Calendarview/Calendarview";
-import MetricCard from "../components/Calendarview/Metriccard";
-import TopServicesCard from "../components/Calendarview/Topservicescard";
-
-const today = new Date();
-const hour = today.getHours();
-const greeting =
-  hour < 12 ? "Buenos días" : hour < 18 ? "Buenas tardes" : "Buenas noches";
-
-const dayName = today.toLocaleDateString("es-ES", { weekday: "long" });
-const dayNumber = today.getDate();
-const monthName = today.toLocaleDateString("es-ES", { month: "long" });
-const formattedDate = `${dayName}, ${dayNumber} de ${monthName}`;
 
 const Calendar = () => {
+  const [viewMode, setViewMode] = useState<"week" | "month">("week");
   const [copied, setCopied] = useState(false);
   const bookingLink = "https://clipper.agenda.com/mi-barberia";
 
@@ -30,19 +19,38 @@ const Calendar = () => {
 
   return (
     <div className="p-6 flex flex-col gap-6">
-      {/* Header: saludo + fecha + enlace */}
+      {/* Header */}
       <div className="bg-white rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-sm text-gray-500">{formattedDate}</p>
-          <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
-            {greeting}, Barbería Clipper
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">Calendario</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Aquí tienes un resumen de tu jornada.
+            Gestiona visualmente la agenda de tu negocio.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          {/* Vista: Semana / Mes */}
+          <div className="flex bg-gray-100 rounded-lg p-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode("week")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                viewMode === "week" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Semana
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("month")}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                viewMode === "month" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Mes
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={handleCopyLink}
@@ -75,29 +83,8 @@ const Calendar = () => {
         </div>
       </div>
 
-      {/* Calendario semanal */}
+      {/* Calendario */}
       <CalendarView />
-
-      {/* Fila de métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <MetricCard
-          label="Ingresos del mes"
-          value="$550,000"
-          changePercentage={10}
-        />
-        <MetricCard
-          label="Citas completadas"
-          value="60"
-          changePercentage={12}
-        />
-        <TopServicesCard
-          services={[
-            { name: "Corte clásico", percentage: 45 },
-            { name: "Barba", percentage: 30 },
-            { name: "Corte + Barba", percentage: 25 },
-          ]}
-        />
-      </div>
     </div>
   );
 };

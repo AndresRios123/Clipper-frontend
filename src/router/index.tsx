@@ -10,12 +10,13 @@ import Clients from "../pages/Clients";
 import Services from "../pages/Services";
 import Employees from "../pages/Employees";
 import Reports from "../pages/Reports";
+import Settings from "../pages/Settings";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     children: [
-      { index: true, element: <Navigate to="/register" replace /> },
+      { index: true, element: <Navigate to="/login" replace /> },
       {
         element: <AuthLayout />,
         children: [
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
           { path: "servicios", element: <Services /> },
           { path: "empleados", element: <Employees /> },
           { path: "reportes", element: <Reports /> },
+          { path: "ajustes", element: <Settings /> },
         ],
       },
     ],

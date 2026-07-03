@@ -1,4 +1,5 @@
 import {
+  LayoutDashboard,
   CalendarDays,
   ClipboardList,
   UserPlus,
@@ -22,6 +23,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
+  { icon: <LayoutDashboard size={20} />, label: "Dashboard", to: "/dashboard" },
   { icon: <CalendarDays size={20} />, label: "Calendario", to: "/calendar" },
   { icon: <ClipboardList size={20} />, label: "Citas", to: "/citas" },
   { icon: <UserPlus size={20} />, label: "Clientes", to: "/clientes" },
@@ -100,17 +102,17 @@ const SidebarContent = ({
       {/* Ajustes (anclado al fondo) */}
       <div className="px-4 pb-6">
         <NavLink
-          to="/dashboard"
+          to="/ajustes"
           onClick={onLinkClick}
           end
           title={collapsed ? "Ajustes" : undefined}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-            isActivePath("/dashboard")
+            isActivePath("/ajustes")
               ? "bg-white/15 text-white"
               : "text-white/70 hover:bg-white/10 hover:text-white"
           } ${collapsed ? "justify-center" : ""}`}
         >
-          {isActivePath("/dashboard") && !collapsed && (
+          {isActivePath("/ajustes") && !collapsed && (
             <span className="w-2 h-2 rounded-full bg-white flex-shrink-0" />
           )}
           <Settings size={20} />
