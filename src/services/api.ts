@@ -51,3 +51,34 @@ export function login(params: LoginParams) {
     body: JSON.stringify(params),
   })
 }
+
+// ---- Register Owner ----
+
+export type RegisterOwnerResponse = LoginResponse & {
+  barberia :{
+    id_: string;
+    nombre: string;
+    direccion: string;
+    telefono: string;
+    email: string;
+  };
+};
+
+export type RegisterOwnerParams = {
+  nombre: string;
+  email: string;
+  password: string;
+  barberia: {
+    nombre: string;
+    direccion: string;
+    telefono: string;
+    email: string;
+  };
+};
+
+export function registerOwner(params: RegisterOwnerParams) {
+  return request<RegisterOwnerResponse>("/auth/register/owner", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
