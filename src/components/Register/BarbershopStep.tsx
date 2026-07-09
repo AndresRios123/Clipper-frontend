@@ -22,9 +22,10 @@ export type BarbershopFormData = z.infer<typeof barbershopSchema>;
 type BarbershopStepProps = {
   onSubmitStep: (data: BarbershopFormData) => void;
   onBack: () => void;
+  isLoading?: boolean;
 };
 
-const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
+const BarbershopStep = ({ onSubmitStep, onBack, isLoading = false }: BarbershopStepProps) => {
   const {
     register,
     handleSubmit,
@@ -157,9 +158,14 @@ const BarbershopStep = ({ onSubmitStep, onBack }: BarbershopStepProps) => {
           </button>
           <button
             type="submit"
-            className="flex-1 bg-[#7883FF] text-white text-sm font-semibold rounded-full px-6 py-3 hover:bg-[#6670e8] transition-colors"
+            disabled={isLoading}
+            className={`flex-1 text-white text-sm font-semibold rounded-full px-6 py-3 transition-colors ${
+              isLoading
+                ? "bg-[#7883FF]/60 cursor-not-allowed"
+                : "bg-[#7883FF] hover:bg-[#6670e8]"
+            }`}
           >
-            Finalizar
+            {isLoading ? "Registrando…" : "Finalizar"}
           </button>
         </div>
       </form>

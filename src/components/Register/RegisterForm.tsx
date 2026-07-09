@@ -9,9 +9,10 @@ export type RegisterFormData = {
 
 type RegisterFormProps = {
   onComplete: (data: RegisterFormData) => void;
+  isLoading?: boolean;
 };
 
-const RegisterForm = ({ onComplete }: RegisterFormProps) => {
+const RegisterForm = ({ onComplete, isLoading = false }: RegisterFormProps) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [accountData, setAccountData] = useState<AccountFormData | null>(null);
 
@@ -46,6 +47,7 @@ const RegisterForm = ({ onComplete }: RegisterFormProps) => {
           <BarbershopStep
             onSubmitStep={handleBarbershopSubmit}
             onBack={handleBack}
+            isLoading={isLoading}
           />
         </div>
       </div>
