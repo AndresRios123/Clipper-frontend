@@ -21,7 +21,7 @@
 // PublicRoute que redirige a /dashboard si ya hay sesión.
 // ===============================================
 
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute, { PublicRoute, RootRedirect } from "../components/ProtectedRoute";
