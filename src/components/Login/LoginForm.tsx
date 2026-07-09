@@ -14,9 +14,11 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 type LoginFormProps = {
   onSubmit: (data: LoginFormData) => void;
+  isLoading?: boolean;
+  error?: string | null;
 };
 
-const LoginForm = ({ onSubmit }: LoginFormProps) => {
+const LoginForm = ({ onSubmit, isLoading = false, error }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -36,6 +38,13 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
       <p className="text-sm text-white/80 mb-8">
         Ingresa tus credenciales para acceder a tu cuenta.
       </p>
+
+      {/* Mensaje de error (si hay) */}
+      {error && (
+        <div className="bg-red-400/20 border border-red-400/40 text-white text-sm rounded-lg px-4 py-2.5">
+          {error}
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -114,9 +123,14 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
         {/* Botón */}
         <button
           type="submit"
-          className="mt-2 bg-[#7883FF] text-white text-sm font-semibold rounded-full px-6 py-3 hover:bg-[#6670e8] transition-colors"
+          disabled={isLoading}
+          className={`mt-2 text-white text-sm font-semibold rounded-full px-6 py-3 transition-colors ${
+            isLoading
+              ? "bg-[#7883FF]/60 cursor-not-allowed"
+              : "bg-[#7883FF] hover:bg-[#6670e8]"
+          }`}
         >
-          Iniciar sesión
+          {isLoading ? "Iniciando sesión…" : "Iniciar sesión"}
         </button>
       </form>
     </div>
