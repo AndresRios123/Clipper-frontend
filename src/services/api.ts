@@ -8,7 +8,10 @@
 // directamente.
 // ===============================================
 
-const API_BASE = "/api";
+// En desarrollo (Vite proxy): API_BASE = "/api" → redirige a localhost:3000
+// En producción (Vercel):     API_BASE = "https://..." → va directo a Render
+// La variable VITE_API_URL se configura en las env vars de Vercel.
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
 // -------------------------------------------------
 // request() - función genérica que envuelve fetch()
