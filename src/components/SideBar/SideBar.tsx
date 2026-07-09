@@ -7,14 +7,16 @@ import {
   UserCog,
   BarChart3,
   Settings,
+  LogOut,
   ChevronLeft,
   Menu,
   X,
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useRef, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useSidebar } from "./Sidebarcontext";
+import { useAuth } from "../../context/AuthContext";
 
 type NavItem = {
   icon: ReactNode;
@@ -42,6 +44,13 @@ const SidebarContent = ({
   onLinkClick?: () => void;
 }) => {
   const { pathname } = useLocation();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
   const listRef = useRef<HTMLUListElement>(null);
   const [indicatorTop, setIndicatorTop] = useState(0);
   const [indicatorHeight, setIndicatorHeight] = useState(0);
@@ -118,6 +127,24 @@ const SidebarContent = ({
           <Settings size={20} />
           {!collapsed && "Ajustes"}
         </NavLink>
+      </div>
+
+      {/* Cerrar sesión (al fondo del todo) */}
+      <div className="px-4 pb-6 border-t border-white/10 pt-4">
+        <button
+          type="button"
+          onClick={() => {
+            handleLogout();
+            onLinkClick?.();
+          }}
+          title={collapsed ? "Cerrar sesión" : undefined}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 text-white/70 hover:bg-white/10 hover:text-white w-full ${
+            collapsed ? "justify-center" : ""
+          }`}
+        >
+          <LogOut size={20} />
+          {!collapsed && "Cerrar sesión"}
+        </button>
       </div>
     </>
   );
