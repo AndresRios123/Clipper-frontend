@@ -55,4 +55,28 @@ export const PublicRoute = () => {
   return <Outlet />;
 };
 
+// ===============================================
+// RootRedirect - Redirige desde la raíz (/)
+// ===============================================
+// Este componente se usa en la ruta index (raíz).
+// En lugar de mandar siempre a /login (y que luego
+// PublicRoute redirija de nuevo si hay sesión),
+// evaluamos isAuthenticated UNA SOLA VEZ y
+// redirigimos directamente al destino correcto.
+//
+//   Sin sesión → /login   (un solo redirect)
+//   Con sesión → /dashboard  (un solo redirect)
+// ===============================================
+
+export const RootRedirect = () => {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Navigate
+      to={isAuthenticated ? "/dashboard" : "/login"}
+      replace
+    />
+  );
+};
+
 export default ProtectedRoute;

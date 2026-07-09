@@ -24,7 +24,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
-import ProtectedRoute, { PublicRoute } from "../components/ProtectedRoute";
+import ProtectedRoute, { PublicRoute, RootRedirect } from "../components/ProtectedRoute";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
@@ -40,9 +40,10 @@ export const router = createBrowserRouter([
   {
     path: "/",
     children: [
-      // Ruta raíz: redirige a login (o al dashboard si ya hay sesión,
-      // eso lo maneja el PublicRoute que envuelve /login y /register)
-      { index: true, element: <Navigate to="/login" replace /> },
+      // Ruta raíz: redirige en un solo paso según la sesión.
+      // RootRedirect evalúa isAuthenticated y manda directo a
+      // /dashboard (con sesión) o /login (sin sesión).
+      { index: true, element: <RootRedirect /> },
 
       // ---- Rutas públicas (solo accesibles sin sesión) ----
       {
