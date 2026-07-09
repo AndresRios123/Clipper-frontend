@@ -1,5 +1,6 @@
 import { DollarSign, CalendarDays, Users, Clock } from "lucide-react";
 import StatCard from "../StatCard/StatCard";
+import { useAuth } from "../../context/AuthContext";
 
 const today = new Date();
 const hour = today.getHours();
@@ -11,12 +12,15 @@ const monthName = today.toLocaleDateString("es-ES", { month: "long" });
 const formattedDate = `${dayName}, ${dayNumber} de ${monthName}`;
 
 const DashboardHeader = () => {
+  const { user } = useAuth();
+  const displayName = user?.barberia?.nombre || user?.nombre || "Clipper";
+
   return (
     <div className="bg-white rounded-2xl p-6 flex flex-col gap-6">
       <div>
         <p className="text-sm text-gray-500">{formattedDate}</p>
         <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
-          {greeting}, Barbería Clipper
+          {greeting}, {displayName}
         </h1>
         <p className="text-sm text-gray-500 mt-1">
           Aquí tienes un resumen de tu jornada.
